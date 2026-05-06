@@ -1,0 +1,22 @@
+[project]
+name = "casino-backend"
+version = "0.1.0"
+description = "Play-money casino backend (FastAPI + SQLite)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi[standard]>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sqlalchemy>=2.0",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "bcrypt>=4.1",
+    "pyjwt>=2.8",
+    "python-multipart>=0.0.9",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]

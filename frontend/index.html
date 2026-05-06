@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Coin Casino — играй на игровые монеты</title>
+    <meta
+      name="description"
+      content="Бесплатное казино на игровые монеты: слоты, coinflip, кости, ежедневные бонусы и квесты."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%AA%99%3C/text%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div id="bg" aria-hidden="true"></div>
+
+    <header id="topbar">
+      <a class="brand" href="#/" data-link>
+        <span class="brand-mark">🪙</span>
+        <span class="brand-text">Coin<span class="brand-accent">Casino</span></span>
+      </a>
+      <nav id="nav-desktop" class="nav-desktop">
+        <a href="#/" data-link>Главная</a>
+        <a href="#/games" data-link>Игры</a>
+        <a href="#/quests" data-link data-auth>Квесты</a>
+        <a href="#/leaderboard" data-link>Топ</a>
+        <a href="#/profile" data-link data-auth>Профиль</a>
+        <a href="#/admin" data-link data-admin>Админка</a>
+      </nav>
+      <div class="topbar-right">
+        <div id="balance-pill" class="balance-pill" data-auth hidden>
+          <span class="balance-icon">🪙</span>
+          <span id="balance-amount">0</span>
+        </div>
+        <div id="auth-buttons" class="auth-buttons">
+          <a class="btn btn-ghost" href="#/login" data-link data-noauth>Войти</a>
+          <a class="btn btn-primary" href="#/register" data-link data-noauth>Регистрация</a>
+          <span id="user-pill" class="user-pill" data-auth hidden>
+            <span id="user-name"></span>
+            <button class="btn-link" id="logout-btn">Выйти</button>
+          </span>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="Меню">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <nav id="nav-mobile" class="nav-mobile" aria-hidden="true">
+      <a href="#/" data-link>Главная</a>
+      <a href="#/games" data-link>Игры</a>
+      <a href="#/quests" data-link data-auth>Квесты</a>
+      <a href="#/leaderboard" data-link>Топ</a>
+      <a href="#/profile" data-link data-auth>Профиль</a>
+      <a href="#/admin" data-link data-admin>Админка</a>
+    </nav>
+
+    <main id="app"></main>
+
+    <div id="toast-host" class="toast-host" aria-live="polite"></div>
+
+    <footer class="footer">
+      <span>© <span id="year"></span> CoinCasino</span>
+      <span class="footer-dot">•</span>
+      <span>Игровая валюта, никаких реальных денег</span>
+      <span class="footer-dot">•</span>
+      <span>18+</span>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
