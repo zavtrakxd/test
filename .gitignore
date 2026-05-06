@@ -1,0 +1,24 @@
+# Built artifacts
+*.iml
+.gradle/
+local.properties
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# IDE
+.idea/
+*.iws
+*.ipr
+
+# Keystores (debug keystore is intentionally committed for reproducible APKs)
+*.jks
+!app/debug.keystore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# APKs (do not commit large binaries; release artifacts are uploaded separately)
+*.apk
