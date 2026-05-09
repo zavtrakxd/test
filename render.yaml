@@ -1,0 +1,31 @@
+# Render Blueprint for one-click deploy of the play-money casino.
+# - Free tier; the SQLite DB lives on a persistent disk so balances survive restarts.
+# - After connecting this repo on https://dashboard.render.com Render will
+#   pick up this file and provision the service automatically.
+services:
+  - type: web
+    name: casino
+    plan: free
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    region: frankfurt
+    autoDeploy: true
+    envVars:
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        value: admin12345
+      - key: SIGNUP_BONUS
+        value: "1000"
+      - key: DAILY_BONUS
+        value: "250"
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: JWT_SECRET
+        generateValue: true
+    disk:
+      name: casino-data
+      mountPath: /data
+      sizeGB: 1
+    healthCheckPath: /api/health
