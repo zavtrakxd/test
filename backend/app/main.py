@@ -141,5 +141,15 @@ if _static_dir.is_dir():
             raise HTTPException(status_code=404)
         candidate = _static_dir / full_path
         if full_path and candidate.is_file():
+            # Long-cache versioned/hashed assets, but always re-validate raw
+            # JS/CSS/HTML so the SPA picks up new code instantly.
+            if candidate.suffix in {".js", ".css", ".html"}:
+                return FileResponse(
+                    candidate,
+                    headers={"Cache-Control": "no-cache, must-revalidate"},
+                )
             return FileResponse(candidate)
-        return FileResponse(_static_dir / "index.html")
+        return FileResponse(
+            _static_dir / "index.html",
+            headers={"Cache-Control": "no-cache, must-revalidate"},
+        )
