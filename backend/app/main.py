@@ -19,9 +19,46 @@ from .routes_user import router as user_router
 from .seed import run_seed
 
 
+def _migrate_add_columns() -> None:
+    """Best-effort SQLite ALTER TABLE for newly added User columns.
+
+    `Base.metadata.create_all` only creates missing tables; it doesn't add
+    new columns. For our small play-money DB we just shim a simple migration
+    that adds known columns when they don't exist yet.
+    """
+    from sqlalchemy import text
+
+    expected: dict[str, list[tuple[str, str]]] = {
+        "users": [
+            ("free_spins_remaining", "INTEGER NOT NULL DEFAULT 0"),
+            ("free_spin_bet", "INTEGER NOT NULL DEFAULT 0"),
+        ],
+    }
+    with engine.connect() as conn:
+        for table, cols in expected.items():
+            try:
+                rows = conn.execute(
+                    text(f"PRAGMA table_info({table})")
+                ).fetchall()
+            except Exception:
+                continue
+            existing = {row[1] for row in rows}
+            for name, ddl in cols:
+                if name in existing:
+                    continue
+                try:
+                    conn.execute(
+                        text(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}")
+                    )
+                except Exception:
+                    pass
+        conn.commit()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    _migrate_add_columns()
     with SessionLocal() as db:
         run_seed(db)
     yield
@@ -104,5 +141,15 @@ if _static_dir.is_dir():
             raise HTTPException(status_code=404)
         candidate = _static_dir / full_path
         if full_path and candidate.is_file():
+            # Long-cache versioned/hashed assets, but always re-validate raw
+            # JS/CSS/HTML so the SPA picks up new code instantly.
+            if candidate.suffix in {".js", ".css", ".html"}:
+                return FileResponse(
+                    candidate,
+                    headers={"Cache-Control": "no-cache, must-revalidate"},
+                )
             return FileResponse(candidate)
-        return FileResponse(_static_dir / "index.html")
+        return FileResponse(
+            _static_dir / "index.html",
+            headers={"Cache-Control": "no-cache, must-revalidate"},
+        )
