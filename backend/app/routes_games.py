@@ -38,9 +38,9 @@ def _record_round(
     won: bool,
     details: dict,
 ) -> GameResult:
-    # Debit the bet first.
-    credit(db, user, -bet, type_=f"{game}_bet", description=f"{game} bet")
-    user.total_bet += bet
+    if bet > 0:
+        credit(db, user, -bet, type_=f"{game}_bet", description=f"{game} bet")
+        user.total_bet += bet
     user.total_games_played += 1
     if won:
         credit(db, user, payout, type_=f"{game}_win", description=f"{game} win")
@@ -77,9 +77,49 @@ def slots(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> GameResult:
-    _validate_bet(user, body.bet)
-    payout, won, details = play_slots(body.bet)
-    return _record_round(db, user, "slots", body.bet, payout, won, details)
+    """Play one slot spin.
+
+    If the user has free spins remaining we ignore the requested bet and
+    re-use the saved bet from the triggering spin (with a 2× win multiplier).
+    Otherwise we treat it as a normal paid spin and validate the bet.
+    """
+    if user.banned:
+        raise HTTPException(status_code=403, detail="Account is banned")
+
+    is_free_spin = user.free_spins_remaining > 0
+    effective_bet = user.free_spin_bet if is_free_spin else body.bet
+
+    if is_free_spin:
+        # Decrement first; we don't debit the balance for free spins.
+        user.free_spins_remaining -= 1
+        if user.free_spins_remaining <= 0:
+            user.free_spin_bet = 0
+            user.free_spins_remaining = 0
+    else:
+        _validate_bet(user, body.bet)
+
+    payout, won, details = play_slots(effective_bet, free_spin=is_free_spin)
+
+    # Award additional free spins if scatter triggered them.
+    awarded = int(details.get("free_spins_awarded", 0))
+    if awarded:
+        user.free_spins_remaining += awarded
+        if user.free_spin_bet == 0:
+            user.free_spin_bet = effective_bet
+
+    details["was_free_spin"] = is_free_spin
+    details["free_spins_remaining"] = user.free_spins_remaining
+    details["free_spin_bet"] = user.free_spin_bet
+
+    return _record_round(
+        db,
+        user,
+        "slots",
+        0 if is_free_spin else effective_bet,
+        payout,
+        won,
+        details,
+    )
 
 
 @router.post("/coinflip", response_model=GameResult)

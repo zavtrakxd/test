@@ -35,6 +35,8 @@ class UserPublic(BaseModel):
     total_bet: int
     total_won: int
     biggest_win: int
+    free_spins_remaining: int = 0
+    free_spin_bet: int = 0
     created_at: datetime
 
 

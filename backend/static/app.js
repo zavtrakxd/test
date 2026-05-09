@@ -301,8 +301,8 @@ function gameTilesGrid({ asLinks }) {
   const items = [
     {
       icon: "🎰",
-      title: "Слоты",
-      text: "3 барабана, 6 символов. Триплеты дают до 50× ставки.",
+      title: "Slots Royale",
+      text: "5×3, 5 линий, Wild ⭐ и Scatter 💰 с фриспинами ×2. До 2500× за линию.",
       href: "#/games/slots",
     },
     {
@@ -583,65 +583,330 @@ route("/games/slots", (root) => renderSlots(root), { requireAuth: true });
 route("/games/coinflip", (root) => renderCoinflip(root), { requireAuth: true });
 route("/games/dice", (root) => renderDice(root), { requireAuth: true });
 
-const SLOT_ALL = ["🍒", "🍋", "🍇", "🔔", "⭐", "7️⃣"];
+// 5×3 slot machine — 5 paylines, wild ⭐, scatter 💰, free spins.
+const SLOT_REELS = 5;
+const SLOT_ROWS = 3;
+const SLOT_SYMBOLS = ["🍒", "🍋", "🍊", "🔔", "💎", "7️⃣", "⭐", "💰"];
+const SLOT_LINE_COLORS = ["#ffc83d", "#5cf2c4", "#ff7adb", "#74b6ff", "#ffae5c"];
+const SLOT_PAYLINES = [
+  [1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0],
+  [2, 2, 2, 2, 2],
+  [0, 1, 2, 1, 0],
+  [2, 1, 0, 1, 2],
+];
+const SLOT_PAYTABLE = [
+  { sym: "7️⃣", name: "Семёрка", x: { 3: 75, 4: 380, 5: 2500 } },
+  { sym: "💎", name: "Бриллиант", x: { 3: 22, 4: 110, 5: 550 } },
+  { sym: "⭐", name: "Wild — заменяет любой символ кроме 💰", x: { 3: 28, 4: 140, 5: 1100 } },
+  { sym: "🔔", name: "Колокольчик", x: { 3: 7, 4: 35, 5: 220 } },
+  { sym: "🍊", name: "Апельсин", x: { 3: 3.5, 4: 16, 5: 80 } },
+  { sym: "🍋", name: "Лимон", x: { 3: 2.5, 4: 10, 5: 50 } },
+  { sym: "🍒", name: "Вишня", x: { 3: 2, 4: 7, 5: 35 } },
+  { sym: "💰", name: "Scatter — 3+ → бонус-фриспины", x: { 3: 5, 4: 20, 5: 100 } },
+];
 
 function renderSlots(root) {
+  const cellsByPos = []; // [reelIdx][rowIdx] = <span> for highlighting
+  const reelsContainer = el("div", { class: "reels" });
+  for (let r = 0; r < SLOT_REELS; r++) {
+    cellsByPos[r] = [];
+    const reel = el("div", { class: "reel", "data-reel": String(r) });
+    const strip = el("div", { class: "reel-strip" });
+    // Pre-fill with random symbols; final ones get rendered after spin
+    const startSyms = randomReelSymbols(SLOT_ROWS);
+    for (let i = 0; i < SLOT_ROWS; i++) {
+      const span = el("span", {}, startSyms[i]);
+      strip.append(span);
+      cellsByPos[r][i] = span;
+    }
+    reel.append(strip);
+    reel._strip = strip;
+    reel._currentSyms = startSyms.slice();
+    reelsContainer.append(reel);
+  }
+
+  // Payline overlay (drawn over the reels once they land)
+  const payNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(payNS, "svg");
+  svg.setAttribute("class", "payline-svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("preserveAspectRatio", "none");
+
+  const board = el(
+    "div",
+    { class: "slots-board" },
+    reelsContainer,
+    el("div", { class: "fs-counter hidden", id: "fs-counter" }, "")
+  );
+  board.append(svg);
+  board._svg = svg;
+  board._cells = cellsByPos;
+
+  const banner = el("div", { class: "slots-banner hidden", id: "slots-banner" }, "🎉 FREE SPINS!");
+
   const machine = el(
     "div",
     { class: "slots-machine" },
-    el("h2", { class: "h2", style: "margin-top:0" }, "🎰 Слоты"),
-    el("p", { class: "muted", style: "margin:0 0 12px" }, "3 одинаковых = до 50× ставки. Любые 2 = 1.5×."),
-    el("div", { class: "reels" }, reelEl("r1"), reelEl("r2"), reelEl("r3")),
+    el("h2", { class: "h2", style: "margin-top:0" }, "🎰 Slots Royale"),
+    el(
+      "p",
+      { class: "muted", style: "margin:0 0 10px" },
+      "5 барабанов × 3 ряда, 5 линий выплат. ⭐ Wild подставляется в линию, 💰 Scatter (3+) даёт фриспины с ×2 множителем."
+    ),
+    banner,
+    board,
+    paylineLegendEl(),
+    el("div", { class: "win-line-list", id: "slots-line-list" }),
     el("div", { class: "slots-result", id: "slots-result" }, "")
   );
-  root.append(
-    el("div", { class: "card", style: "max-width:560px;margin:0 auto" }, machine, betControls("slots"))
+
+  const paytableToggle = el(
+    "button",
+    {
+      type: "button",
+      class: "btn btn-ghost",
+      style: "margin-top:10px",
+      onclick: () => {
+        const pt = $("#slots-paytable");
+        pt.style.display = pt.style.display === "none" ? "" : "none";
+      },
+    },
+    "Таблица выплат"
   );
+  const paytable = paytableEl();
+  paytable.id = "slots-paytable";
+  paytable.style.display = "none";
+
+  const card = el(
+    "div",
+    { class: "card", style: "max-width:780px;margin:0 auto" },
+    machine,
+    betControls("slots"),
+    paytableToggle,
+    paytable
+  );
+  root.append(card);
+
+  // Stash board on the router root and on #app so animateGame can find it.
+  root._slotBoard = board;
+  const app = $("#app");
+  if (app) app._slotBoard = board;
+
+  updateFreeSpinUI();
 }
 
-function reelEl(id) {
-  const reel = el("div", { class: "reel", id });
-  const strip = el("div", { class: "reel-strip" });
-  strip.append(...SLOT_ALL.map((s) => el("span", {}, s)));
-  reel.append(strip);
-  reel._strip = strip;
-  // initialize at first symbol
-  strip.style.transform = "translateY(0)";
-  return reel;
+function randomReelSymbols(n) {
+  const out = [];
+  for (let i = 0; i < n; i++) out.push(SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]);
+  return out;
 }
 
-function spinReel(reelEl, finalSymbol) {
+function paylineLegendEl() {
+  const legend = el("div", { class: "payline-legend", id: "slots-legend" });
+  ["Линия 1: ━", "Линия 2: ━ ▲", "Линия 3: ━ ▼", "Линия 4: V", "Линия 5: ^"].forEach((label, i) => {
+    legend.append(
+      el(
+        "span",
+        { class: "pl-pill", "data-line": String(i), style: `color:${SLOT_LINE_COLORS[i]}` },
+        el("span", { class: "pl-dot" }),
+        label
+      )
+    );
+  });
+  return legend;
+}
+
+function paytableEl() {
+  const wrap = el("div", { class: "slots-paytable" });
+  for (const entry of SLOT_PAYTABLE) {
+    const card = el("div", { class: "pt-card" });
+    card.append(
+      el(
+        "div",
+        { style: "display:flex;align-items:center;gap:8px;margin-bottom:4px" },
+        el("span", { class: "sym" }, entry.sym),
+        el("b", {}, entry.name)
+      )
+    );
+    for (const k of [3, 4, 5]) {
+      card.append(
+        el(
+          "div",
+          { class: "row" },
+          el("span", {}, `× ${k}`),
+          el("b", {}, `${entry.x[k]}× линия`)
+        )
+      );
+    }
+    wrap.append(card);
+  }
+  return wrap;
+}
+
+function updateFreeSpinUI() {
+  const u = state.user;
+  const fsCounter = $("#fs-counter");
+  const banner = $("#slots-banner");
+  const playBtn = $("#play-btn");
+  const betInput = $("#bet-input");
+  if (!u) return;
+  if (u.free_spins_remaining > 0) {
+    if (fsCounter) {
+      fsCounter.textContent = `🎁 Free spins: ${u.free_spins_remaining} (×2)`;
+      fsCounter.classList.remove("hidden");
+    }
+    if (banner) banner.classList.remove("hidden");
+    if (playBtn) playBtn.textContent = `🎰 FREE SPIN ×${u.free_spin_bet}`;
+    if (betInput) betInput.disabled = true;
+  } else {
+    if (fsCounter) fsCounter.classList.add("hidden");
+    if (banner) banner.classList.add("hidden");
+    if (playBtn) playBtn.textContent = gameButtonLabel("slots");
+    if (betInput) betInput.disabled = false;
+  }
+}
+
+function spinReelTo(reelEl, finalSymbols, delayMs, durationMs) {
   return new Promise((resolve) => {
     const strip = reelEl._strip;
-    const stripChildren = SLOT_ALL.length;
-    const cellHeight = reelEl.offsetHeight || 110;
-    const period = stripChildren * cellHeight;
-    const targetIndex = SLOT_ALL.indexOf(finalSymbol);
-    const cycles = 6 + Math.floor(Math.random() * 3);
-    const totalDistance = (cycles * stripChildren + targetIndex) * cellHeight;
-    const duration = 900 + Math.random() * 250;
-    const start = performance.now();
-    const startVisualY = parseFloat(strip.dataset.y || "0"); // in [-period, 0]
-    function frame(now) {
-      const t = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
-      // logical y is monotonically decreasing
-      const logicalY = startVisualY - eased * totalDistance;
-      // wrap into [-period, 0]
-      let visualY = logicalY % period;
-      if (visualY > 0) visualY -= period;
-      strip.style.transform = `translateY(${visualY}px)`;
-      if (t < 1) requestAnimationFrame(frame);
-      else {
-        // snap exactly to the target
-        const finalY = -targetIndex * cellHeight;
-        strip.style.transform = `translateY(${finalY}px)`;
-        strip.dataset.y = String(finalY);
-        resolve();
-      }
+    const cellH = reelEl.firstElementChild.firstElementChild.offsetHeight || 76;
+    const padding = 30; // extra symbols to spin past
+    const symbolBuffer = [];
+    for (let i = 0; i < padding; i++) {
+      symbolBuffer.push(SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]);
     }
-    requestAnimationFrame(frame);
+    // Build new strip: current symbols + buffer + final symbols.
+    strip.innerHTML = "";
+    const currentSyms = reelEl._currentSyms || randomReelSymbols(SLOT_ROWS);
+    const allSyms = [...currentSyms, ...symbolBuffer, ...finalSymbols];
+    for (const s of allSyms) strip.append(el("span", {}, s));
+    // Total distance to translate so finalSymbols line up at the top.
+    const distance = (allSyms.length - SLOT_ROWS) * cellH;
+
+    setTimeout(() => {
+      reelEl.classList.add("spinning");
+      strip.style.transition = "none";
+      strip.style.transform = "translateY(0)";
+      // Force reflow so the next transition triggers correctly.
+      void strip.offsetHeight;
+      strip.style.transition = `transform ${durationMs}ms cubic-bezier(0.2, 0.85, 0.25, 1)`;
+      strip.style.transform = `translateY(${-distance}px)`;
+      const onEnd = () => {
+        reelEl.classList.remove("spinning");
+        strip.removeEventListener("transitionend", onEnd);
+        // Snap: replace strip with just the final symbols at offset 0
+        strip.style.transition = "none";
+        strip.style.transform = "translateY(0)";
+        strip.innerHTML = "";
+        const cells = [];
+        for (const s of finalSymbols) {
+          const span = el("span", {}, s);
+          strip.append(span);
+          cells.push(span);
+        }
+        reelEl._currentSyms = finalSymbols.slice();
+        // Update cell refs in cellsByPos (passed via closure caller below).
+        resolve(cells);
+      };
+      strip.addEventListener("transitionend", onEnd);
+    }, delayMs);
   });
+}
+
+async function animateSlotSpin(board, grid) {
+  const reels = board.querySelectorAll(".reel");
+  const tasks = [];
+  for (let r = 0; r < SLOT_REELS; r++) {
+    const reel = reels[r];
+    const finalSyms = grid[r];
+    tasks.push(
+      spinReelTo(reel, finalSyms, r * 130, 850 + r * 90).then((cells) => {
+        // Update board._cells refs
+        board._cells[r] = cells;
+      })
+    );
+  }
+  // Clear previous highlights/lines while spinning.
+  clearSlotHighlights(board);
+  await Promise.all(tasks);
+}
+
+function clearSlotHighlights(board) {
+  if (!board) return;
+  board.querySelectorAll(".cell-glow").forEach((g) => g.remove());
+  if (board._svg) {
+    while (board._svg.firstChild) board._svg.removeChild(board._svg.firstChild);
+  }
+  document.querySelectorAll("#slots-legend .pl-pill").forEach((p) => p.classList.remove("active"));
+}
+
+function highlightSlotWins(board, details) {
+  const lines = details.lines || [];
+  const scatter = details.scatter;
+
+  // Highlight cells per winning payline.
+  for (const line of lines) {
+    const color = SLOT_LINE_COLORS[line.line_index] || "#ffc83d";
+    for (let r = 0; r < line.count; r++) {
+      const row = line.rows[r];
+      const cellSpan = board._cells[r][row];
+      if (!cellSpan) continue;
+      glowCell(board, r, row, color);
+    }
+    drawPayline(board, line.line_index, line.rows, line.count, color);
+    const pill = document.querySelector(`#slots-legend [data-line="${line.line_index}"]`);
+    if (pill) pill.classList.add("active");
+  }
+
+  // Highlight scatter cells in pink.
+  if (scatter && scatter.positions) {
+    for (const [r, row] of scatter.positions) {
+      glowCell(board, r, row, "#ff7adb", true);
+    }
+  }
+}
+
+function glowCell(board, reelIdx, rowIdx, color, isScatter = false) {
+  const reels = board.querySelectorAll(".reel");
+  const reel = reels[reelIdx];
+  if (!reel) return;
+  const cellH = reel.firstElementChild.firstElementChild.offsetHeight || 76;
+  const glow = el("div", { class: "cell-glow" + (isScatter ? " scatter" : "") });
+  glow.style.position = "absolute";
+  glow.style.left = "2px";
+  glow.style.right = "2px";
+  glow.style.top = `${rowIdx * cellH + 2}px`;
+  glow.style.height = `${cellH - 4}px`;
+  glow.style.borderRadius = "8px";
+  glow.style.setProperty("--gold", color);
+  glow.style.borderColor = color;
+  glow.style.boxShadow = `0 0 14px 2px ${color}, inset 0 0 14px ${color}55`;
+  reel.appendChild(glow);
+}
+
+function drawPayline(board, lineIndex, rows, count, color) {
+  const svg = board._svg;
+  if (!svg) return;
+  const ns = "http://www.w3.org/2000/svg";
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("stroke", color);
+  // Compute % positions: x along reel center, y along row center.
+  // Reels are evenly spaced; with 5 reels the centers are at 10%, 30%, 50%, 70%, 90%.
+  // Rows: 3 rows; centers at 16.66%, 50%, 83.33%.
+  const xs = [10, 30, 50, 70, 90];
+  const ysByRow = [16.66, 50, 83.33];
+  let d = "";
+  for (let r = 0; r < count; r++) {
+    const x = xs[r];
+    const y = ysByRow[rows[r]];
+    d += (r === 0 ? "M" : "L") + x.toFixed(2) + "," + y.toFixed(2) + " ";
+  }
+  path.setAttribute("d", d.trim());
+  path.style.color = color;
+  svg.appendChild(path);
+  // Trigger fade-in
+  requestAnimationFrame(() => path.classList.add("show"));
 }
 
 function betControls(game, extras) {
@@ -674,14 +939,20 @@ async function playGame(game, betInput) {
   const errEl = $("#play-error");
   errEl.textContent = "";
   const playBtn = $("#play-btn");
-  const bet = parseInt(betInput.value, 10);
-  if (!Number.isFinite(bet) || bet <= 0) {
-    errEl.textContent = "Введи корректную ставку";
-    return;
-  }
-  if (bet > state.user.balance) {
-    errEl.textContent = "Недостаточно монет";
-    return;
+  const isFreeSpinSlots =
+    game === "slots" && state.user && state.user.free_spins_remaining > 0;
+  const bet = isFreeSpinSlots
+    ? state.user.free_spin_bet
+    : parseInt(betInput.value, 10);
+  if (!isFreeSpinSlots) {
+    if (!Number.isFinite(bet) || bet <= 0) {
+      errEl.textContent = "Введи корректную ставку";
+      return;
+    }
+    if (bet > state.user.balance) {
+      errEl.textContent = "Недостаточно монет";
+      return;
+    }
   }
   playBtn.disabled = true;
   let body = { bet };
@@ -706,9 +977,14 @@ async function playGame(game, betInput) {
   try {
     const result = await api(`/api/games/${game}`, { method: "POST", body });
     state.user.balance = result.new_balance;
+    if (game === "slots" && result.details) {
+      state.user.free_spins_remaining = result.details.free_spins_remaining ?? 0;
+      state.user.free_spin_bet = result.details.free_spin_bet ?? 0;
+    }
     syncChrome();
     await animateGame(game, result);
     showGameResult(game, result);
+    if (game === "slots") updateFreeSpinUI();
   } catch (e) {
     errEl.textContent = e.message;
   } finally {
@@ -718,18 +994,14 @@ async function playGame(game, betInput) {
 
 async function animateGame(game, result) {
   if (game === "slots") {
-    const [a, b, c] = result.details.reels;
-    $("#r1").classList.add("spinning");
-    $("#r2").classList.add("spinning");
-    $("#r3").classList.add("spinning");
-    await Promise.all([
-      spinReel($("#r1"), a),
-      delay(120).then(() => spinReel($("#r2"), b)),
-      delay(240).then(() => spinReel($("#r3"), c)),
-    ]);
-    $("#r1").classList.remove("spinning");
-    $("#r2").classList.remove("spinning");
-    $("#r3").classList.remove("spinning");
+    const root = $("#app");
+    const board = (root && root._slotBoard) || $(".slots-board");
+    if (board) {
+      await animateSlotSpin(board, result.details.grid);
+      // Slight settle pause then highlight wins
+      await delay(120);
+      highlightSlotWins(board, result.details);
+    }
   } else if (game === "coinflip") {
     const coin = $("#coin");
     coin.classList.remove("flipping");
@@ -758,13 +1030,58 @@ function showGameResult(game, result) {
     text = `🏆 Победа! +${fmtNum(profit)} 🪙 (выплата ${fmtNum(result.payout)})`;
     toast(`+${fmtNum(profit)} 🪙`, "good");
   } else {
-    text = `❌ Не повезло. −${fmtNum(result.bet)} 🪙`;
+    text = result.bet > 0
+      ? `❌ Не повезло. −${fmtNum(result.bet)} 🪙`
+      : "Без выигрыша";
   }
   if (game === "slots") {
     const r = $("#slots-result");
     if (r) {
       r.textContent = text;
       r.style.color = result.won ? "var(--good)" : "var(--muted)";
+    }
+    // Build per-line breakdown.
+    const list = $("#slots-line-list");
+    if (list) {
+      list.innerHTML = "";
+      const d = result.details || {};
+      for (const line of d.lines || []) {
+        const row = el(
+          "div",
+          { class: "line-row" },
+          el(
+            "span",
+            {},
+            `Линия ${line.line_index + 1} (${line.line_name}) — ${line.symbol} × ${line.count}`
+          ),
+          el("b", { style: "color:var(--good)" }, `+${fmtNum(line.payout)} 🪙`)
+        );
+        list.append(row);
+      }
+      if (d.scatter) {
+        const sc = d.scatter;
+        const row = el(
+          "div",
+          { class: "line-row scatter" },
+          el(
+            "span",
+            {},
+            `💰 Scatter × ${sc.count} → ${sc.multiplier}× ставки${sc.free_spins_awarded ? ` + ${sc.free_spins_awarded} фриспинов` : ""}`
+          ),
+          el(
+            "b",
+            { style: "color:#ff7adb" },
+            `+${fmtNum(sc.payout)} 🪙`
+          )
+        );
+        list.append(row);
+      }
+    }
+    if (result.details && result.details.free_spins_awarded > 0) {
+      toast(
+        `🎉 +${result.details.free_spins_awarded} фриспинов с ×2 множителем!`,
+        "good"
+      );
     }
   } else if (game === "coinflip") {
     const r = $("#cf-result");

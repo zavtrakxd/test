@@ -40,6 +40,10 @@ class User(Base):
     total_won: Mapped[int] = mapped_column(Integer, default=0)
     biggest_win: Mapped[int] = mapped_column(Integer, default=0)
 
+    # Slots free-spin state (saved bet + remaining count + win multiplier).
+    free_spins_remaining: Mapped[int] = mapped_column(Integer, default=0)
+    free_spin_bet: Mapped[int] = mapped_column(Integer, default=0)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow
     )
