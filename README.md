@@ -1,57 +1,58 @@
-# Super Browser
+# DevinOS — HyperOS-style mobile shell
 
-A snappy WebView-based Android browser written in Kotlin + Jetpack Compose.
+Beautiful, interactive mobile-OS shell in pure HTML/CSS/JS, inspired by
+HyperOS / MIUI / iOS. Runs in any modern browser — including the one on
+your phone.
 
-It runs on top of the system WebView (Chromium) and adds a stack of features
-on top:
+> ⚠ This is not a real Android replacement. It's a high-fidelity,
+> clickable simulation of a modern mobile OS that runs in a browser.
 
-- **Multiple tabs** with a grid switcher and incognito-mode tabs.
-- **Built-in ad / tracker blocker** powered by a hosts-format block list
-  (StevenBlack) cached on device.
-- **Force dark mode for any site** via `WebSettingsCompat`.
-- **Search engine picker**: DuckDuckGo, Google, Bing, Yandex, Brave, Startpage,
-  Ecosia.
-- **Bookmarks, history, and downloads** with their own bottom-sheet screens.
-- **Find in page** with next / previous navigation.
-- **Reader mode** (heuristic JS injection — works on most article pages).
-- **Desktop site toggle** per tab + a global default.
-- **Save current page as PDF** via Android's print framework.
-- **Material 3 theming** with optional Material You dynamic color (Android 12+)
-  and an app-wide light / dark / system theme switch.
-- **Biometric / device-credential app lock**.
-- **Custom User-Agent**, page zoom slider (50–200%), Do-Not-Track header,
-  cookie controls, popup blocking and JavaScript toggle.
-- **Default browser support** — opens HTTP(S) intents and `Intent.ACTION_SEND`
-  shares from other apps.
+## Features
 
-## Building
+- **Lock screen** with big clock, date, weather + music widgets,
+  flashlight / camera shortcuts, swipe-up to unlock.
+- **Home screen** with weather + clock big widgets, app grid (18 apps),
+  HyperOS-style squircle icons, dock with glassmorphism, page dots.
+- **Control center** (swipe down from top-right) with quick toggles,
+  brightness / volume sliders, music card, mini toggles, theme switch.
+- **Notification panel** (swipe down from top-left) with stacked
+  notification cards and entrance animation.
+- **App switcher / recents** (long swipe up from the bottom).
+- **18 working app screens** — Settings, Calculator (functional),
+  Weather (hourly + weekly), Notes, Photos, Calendar (live month),
+  Clock (world time + alarms), Music, Messages, Phone, Mail, Browser,
+  Camera (viewfinder), Maps, Files, Wallet, Store, Themes.
+- **Light / dark themes** + 4 wallpapers (Aurora, Sunset, Ocean, Mono)
+  with animated gradient blobs.
+- **Live status bar** clock, animated analog clock widget, smooth
+  spring animations, glassmorphism panels.
+- Fully responsive — looks like a phone in a frame on desktop, fills
+  the whole viewport on mobile.
 
-Requires JDK 17 and an Android SDK with `platforms;android-34` and
-`build-tools;34.0.0` installed.
+## Run locally
 
 ```sh
-export ANDROID_HOME=/path/to/android-sdk
-./gradlew :app:assembleRelease
-# APK at app/build/outputs/apk/release/app-release.apk
+# any static server works
+python3 -m http.server 8000
+# → open http://localhost:8000
 ```
 
-The release APK is signed with the standard Android debug keystore that ships
-in the repo so the produced APK is installable on any device. **Replace the
-keystore before publishing to a real store.**
-
-## Project layout
+## Files
 
 ```
-app/
-├── src/main/AndroidManifest.xml
-├── src/main/kotlin/com/zavtrak/superbrowser/
-│   ├── BrowserApplication.kt          # app entry, settings cache, ad-blocker bootstrap
-│   ├── MainActivity.kt                # Compose host, intent routing
-│   ├── adblock/AdBlocker.kt           # hosts-list ad/tracker blocker
-│   ├── browser/                       # tabs, ViewModel, WebView clients
-│   ├── data/PersistenceStore.kt       # bookmarks, history, downloads (JSON in prefs)
-│   ├── search/SearchEngine.kt         # search engine catalog + URL classifier
-│   ├── settings/SettingsRepository.kt # DataStore-backed settings
-│   └── ui/                            # Jetpack Compose screens
-└── src/main/res/                      # icons, strings, themes
+index.html   # markup, layered screens, panels, app host
+styles.css   # full theme system, animations, glassmorphism
+app.js       # apps registry, screen state, gestures, app renderers
 ```
+
+## Gestures / shortcuts
+
+| Action | Effect |
+| --- | --- |
+| Swipe ↑ from bottom (locked) | Unlock |
+| Swipe ↑ from bottom (in app) | Close app |
+| Long swipe ↑ from bottom | Open recents |
+| Swipe ↓ top-right | Open Control Center |
+| Swipe ↓ top-left  | Open Notifications |
+| Tap outside panel | Close panel |
+| `Esc` | Close panel / app / lock |
