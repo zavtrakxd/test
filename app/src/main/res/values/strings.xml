@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DevinOS</string>
+    <string name="search_apps">Поиск приложений</string>
+    <string name="all_apps">Все приложения</string>
+    <string name="settings">Настройки</string>
+    <string name="theme">Тема</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_system">Системная</string>
+    <string name="wallpaper">Обои</string>
+    <string name="wallpaper_aurora">Aurora</string>
+    <string name="wallpaper_sunset">Sunset</string>
+    <string name="wallpaper_ocean">Ocean</string>
+    <string name="wallpaper_mono">Mono</string>
+    <string name="set_as_default_launcher">Сделать DevinOS лаунчером по умолчанию</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="about">О лаунчере</string>
+    <string name="version_label">Версия</string>
+    <string name="dock">Док</string>
+</resources>

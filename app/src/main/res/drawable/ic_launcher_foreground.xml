@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- White rounded "D" centered, occupying the safe inner zone (~66dp). -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,32 L62,32 C72,32 80,42 80,54 C80,66 72,76 62,76 L38,76 Z M48,42 L48,66 L60,66 C66,66 70,60 70,54 C70,48 66,42 60,42 Z" />
+</vector>
