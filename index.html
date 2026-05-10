@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+  />
+  <meta name="theme-color" content="#0a0a0e" />
+  <title>DevinOS — HyperOS-style mobile shell</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ff8a3d'/><stop offset='1' stop-color='%23ff3d6e'/></linearGradient></defs><rect rx='14' ry='14' width='64' height='64' fill='url(%23g)'/><text x='50%25' y='62%25' font-size='34' text-anchor='middle' fill='white' font-family='-apple-system,Segoe UI,Roboto,sans-serif' font-weight='800'>D</text></svg>"
+  />
+</head>
+<body data-theme="dark" data-wallpaper="aurora">
+  <main class="stage">
+    <div class="phone" id="phone" role="application" aria-label="DevinOS phone">
+      <!-- Hardware frame -->
+      <div class="phone-bezel"></div>
+      <div class="phone-notch" aria-hidden="true">
+        <span class="dynamic-island"></span>
+      </div>
+
+      <!-- Wallpaper layer -->
+      <div class="wallpaper" id="wallpaper" aria-hidden="true">
+        <div class="wp-blob wp-blob--a"></div>
+        <div class="wp-blob wp-blob--b"></div>
+        <div class="wp-blob wp-blob--c"></div>
+        <div class="wp-grain"></div>
+      </div>
+
+      <!-- Status bar (always on top) -->
+      <header class="status-bar" id="statusBar">
+        <span class="sb-time" id="sbTime">9:41</span>
+        <span class="sb-right">
+          <span class="sb-icon sb-signal" title="Signal">
+            <svg viewBox="0 0 18 12" width="17" height="11"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></svg>
+          </span>
+          <span class="sb-icon sb-wifi" title="Wi‑Fi">
+            <svg viewBox="0 0 18 13" width="17" height="12"><path d="M9 13a1.6 1.6 0 1 1 0-3.2A1.6 1.6 0 0 1 9 13Zm0-5.4a4.7 4.7 0 0 1 3.34 1.38l1.42-1.42a6.7 6.7 0 0 0-9.52 0l1.42 1.42A4.7 4.7 0 0 1 9 7.6Zm0-4a8.7 8.7 0 0 1 6.16 2.55l1.42-1.42a10.7 10.7 0 0 0-15.16 0L2.84 6.15A8.7 8.7 0 0 1 9 3.6Z"/></svg>
+          </span>
+          <span class="sb-icon sb-battery" title="Battery">
+            <svg viewBox="0 0 27 12" width="26" height="12"><rect x="0.5" y="0.5" width="22" height="11" rx="2.6" fill="none" stroke="currentColor" stroke-opacity=".55"/><rect x="2" y="2" width="19" height="8" rx="1.4" fill="currentColor"/><rect x="23.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity=".55"/></svg>
+          </span>
+        </span>
+      </header>
+
+      <!-- ==================== LOCK SCREEN ==================== -->
+      <section class="screen screen-lock" id="screenLock" data-active="true">
+        <div class="lock-clock">
+          <div class="lock-clock__time" id="lockTime">9:41</div>
+          <div class="lock-clock__date" id="lockDate">Понедельник, 12 мая</div>
+        </div>
+
+        <div class="lock-widgets">
+          <div class="widget widget--weather glass">
+            <div class="weather-row">
+              <div class="weather-temp">+18°</div>
+              <div class="weather-meta">
+                <div class="weather-city">Москва</div>
+                <div class="weather-cond">Облачно с прояснениями</div>
+              </div>
+              <div class="weather-icon">
+                <svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="sunG" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stop-color="#ffd86b"/>
+                      <stop offset="1" stop-color="#ff8a3d"/>
+                    </linearGradient>
+                    <linearGradient id="cloudG" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#ffffff"/>
+                      <stop offset="1" stop-color="#cfd8e8"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="24" cy="26" r="11" fill="url(#sunG)"/>
+                  <path d="M14 44a10 10 0 0 1 19-3 8 8 0 1 1 1 16H18a8 8 0 0 1-4-13Z" fill="url(#cloudG)"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="widget widget--music glass" id="lockMusicWidget">
+            <div class="music-cover" aria-hidden="true">
+              <svg viewBox="0 0 48 48" width="40" height="40"><defs><linearGradient id="mc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5cff"/><stop offset="1" stop-color="#ff5cae"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#mc)"/><path d="M19 16v14a4 4 0 1 1-2-3.46V14l14-2v12a4 4 0 1 1-2-3.46V14Z" fill="white" opacity=".95"/></svg>
+            </div>
+            <div class="music-info">
+              <div class="music-title">Свет в окне</div>
+              <div class="music-artist">Ночной экспресс</div>
+            </div>
+            <button class="music-play" id="lockMusicPlay" aria-label="Play/Pause">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="lock-shortcuts">
+          <button class="lock-shortcut" id="lockFlashlight" aria-label="Фонарик">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 2h6l1 4-1 3v9a3 3 0 1 1-6 0V9L8 6l1-4Zm1 7h4v9a2 2 0 1 1-4 0V9Z" fill="currentColor"/></svg>
+          </button>
+          <button class="lock-shortcut" id="lockCamera" aria-label="Камера">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 4l1.5-2h3L15 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4Zm3 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0 2.2a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z" fill="currentColor"/></svg>
+          </button>
+        </div>
+
+        <div class="lock-unlock-hint">
+          <div class="lock-handle" aria-hidden="true"></div>
+          <div class="lock-hint">Свайп вверх — разблокировать</div>
+        </div>
+      </section>
+
+      <!-- ==================== HOME SCREEN ==================== -->
+      <section class="screen screen-home" id="screenHome" data-active="false">
+        <div class="home-search glass" id="homeSearch">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M10 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12Zm10 16-4.35-4.35" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>Поиск приложений и контактов</span>
+        </div>
+
+        <div class="home-bigwidgets">
+          <div class="bigwidget bigwidget--weather glass" data-app="weather">
+            <div class="bw-top">
+              <div class="bw-temp">+18°</div>
+              <div class="bw-icon">
+                <svg viewBox="0 0 48 48" width="44" height="44"><circle cx="18" cy="20" r="9" fill="#ffd86b"/><path d="M10 34a9 9 0 0 1 17-3 7 7 0 1 1 1 14H14a7 7 0 0 1-4-11Z" fill="#fff" opacity=".95"/></svg>
+              </div>
+            </div>
+            <div class="bw-meta">
+              <div class="bw-city">Москва · Облачно</div>
+              <div class="bw-range">+12° / +21°</div>
+            </div>
+          </div>
+
+          <div class="bigwidget bigwidget--clock glass" data-app="clock">
+            <div class="clock-analog" aria-hidden="true">
+              <div class="clock-face">
+                <span class="tick tick--12"></span>
+                <span class="tick tick--3"></span>
+                <span class="tick tick--6"></span>
+                <span class="tick tick--9"></span>
+                <span class="hand hand--hour" id="handHour"></span>
+                <span class="hand hand--minute" id="handMinute"></span>
+                <span class="hand hand--second" id="handSecond"></span>
+                <span class="clock-center"></span>
+              </div>
+            </div>
+            <div class="clock-meta">
+              <div class="clock-city">Москва</div>
+              <div class="clock-digital" id="clockDigital">9:41</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="home-grid" id="homeGrid">
+          <!-- Apps populated from JS -->
+        </div>
+
+        <div class="page-dots">
+          <span class="dot dot--active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+
+        <nav class="dock glass">
+          <button class="app-icon" data-app="phone" aria-label="Телефон">
+            <span class="ai-tile" style="--g1:#3ddc84;--g2:#0aa869;">
+              <svg viewBox="0 0 24 24" width="26" height="26"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.36 2.3.55 3.6.55a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A18 18 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.3.2 2.5.55 3.6a1 1 0 0 1-.25 1l-2.2 2.2Z" fill="#fff"/></svg>
+            </span>
+            <span class="ai-label">Телефон</span>
+          </button>
+          <button class="app-icon" data-app="messages" aria-label="Сообщения">
+            <span class="ai-tile" style="--g1:#34c0ff;--g2:#1c6df0;">
+              <svg viewBox="0 0 24 24" width="26" height="26"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V5Z" fill="#fff"/></svg>
+            </span>
+            <span class="ai-label">Сообщения</span>
+          </button>
+          <button class="app-icon" data-app="browser" aria-label="Браузер">
+            <span class="ai-tile" style="--g1:#ff7e4d;--g2:#ff2d6e;">
+              <svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" fill="none" stroke="#fff" stroke-width="2"/></svg>
+            </span>
+            <span class="ai-label">Браузер</span>
+          </button>
+          <button class="app-icon" data-app="camera" aria-label="Камера">
+            <span class="ai-tile" style="--g1:#5a5a66;--g2:#1a1a22;">
+              <svg viewBox="0 0 24 24" width="26" height="26"><path d="M9 4l1.5-2h3L15 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4Zm3 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z" fill="#fff"/></svg>
+            </span>
+            <span class="ai-label">Камера</span>
+          </button>
+        </nav>
+      </section>
+
+      <!-- ==================== APP DRAWER (recents) ==================== -->
+      <section class="screen screen-recents" id="screenRecents" data-active="false">
+        <div class="recents-list" id="recentsList"></div>
+        <button class="recents-clear" id="recentsClear">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 7h14M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>Очистить всё</span>
+        </button>
+      </section>
+
+      <!-- ==================== CONTROL CENTER ==================== -->
+      <aside class="panel control-center" id="controlCenter" data-open="false" aria-hidden="true">
+        <div class="cc-handle" aria-hidden="true"></div>
+        <div class="cc-grid">
+          <div class="cc-card glass cc-card--connect">
+            <button class="cc-tile" data-toggle="wifi" aria-pressed="true">
+              <span class="cct-ic">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 21a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4Zm-5-6.6a8 8 0 0 1 10 0l1.4-1.4a10 10 0 0 0-12.8 0L7 14.4Zm-3.6-3.6a13 13 0 0 1 17.2 0L21 9.4a15 15 0 0 0-18 0L3.4 10.8Z" fill="currentColor"/></svg>
+              </span>
+              <span class="cct-label">Wi‑Fi</span>
+              <span class="cct-sub">Home‑5G</span>
+            </button>
+            <button class="cc-tile" data-toggle="bt" aria-pressed="false">
+              <span class="cct-ic">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path d="M7 6l10 12-5 4V2l5 4L7 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="cct-label">Bluetooth</span>
+              <span class="cct-sub">Выкл</span>
+            </button>
+            <button class="cc-tile" data-toggle="cell" aria-pressed="true">
+              <span class="cct-ic">
+                <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="14" width="3" height="6" rx="1" fill="currentColor"/><rect x="8" y="10" width="3" height="10" rx="1" fill="currentColor"/><rect x="13" y="6" width="3" height="14" rx="1" fill="currentColor"/><rect x="18" y="2" width="3" height="18" rx="1" fill="currentColor"/></svg>
+              </span>
+              <span class="cct-label">Моб. данные</span>
+              <span class="cct-sub">5G+</span>
+            </button>
+            <button class="cc-tile" data-toggle="airplane" aria-pressed="false">
+              <span class="cct-ic">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path d="M2 14l9-3V5a2 2 0 1 1 4 0v6l9 3v3l-9-2.4V19l3 2v2l-5-1.6L8 23v-2l3-2v-4.4L2 17v-3Z" fill="currentColor"/></svg>
+              </span>
+              <span class="cct-label">В самолёте</span>
+              <span class="cct-sub">Выкл</span>
+            </button>
+          </div>
+
+          <div class="cc-row">
+            <div class="cc-card glass cc-slider">
+              <div class="cc-slider-ic">
+                <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <input class="cc-range" id="ccBrightness" type="range" min="10" max="100" value="78" aria-label="Яркость" />
+            </div>
+            <div class="cc-card glass cc-slider">
+              <div class="cc-slider-ic">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 9h4l5-4v14l-5-4H4V9Z" fill="currentColor"/><path d="M16 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <input class="cc-range" id="ccVolume" type="range" min="0" max="100" value="55" aria-label="Громкость" />
+            </div>
+          </div>
+
+          <div class="cc-card glass cc-music" id="ccMusic">
+            <div class="music-cover" aria-hidden="true">
+              <svg viewBox="0 0 48 48" width="48" height="48"><defs><linearGradient id="mc2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5cff"/><stop offset="1" stop-color="#ff5cae"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#mc2)"/><path d="M19 16v14a4 4 0 1 1-2-3.46V14l14-2v12a4 4 0 1 1-2-3.46V14Z" fill="white" opacity=".95"/></svg>
+            </div>
+            <div class="music-info">
+              <div class="music-title">Свет в окне</div>
+              <div class="music-artist">Ночной экспресс · Альбом «Дым»</div>
+              <div class="music-progress"><span id="ccMusicBar" style="width:38%"></span></div>
+            </div>
+            <div class="music-controls">
+              <button aria-label="Назад"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 5v14M20 5v14L9 12 20 5Z" fill="currentColor"/></svg></button>
+              <button aria-label="Play/Pause" id="ccMusicPlay"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>
+              <button aria-label="Вперёд"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M18 5v14M4 5v14L15 12 4 5Z" fill="currentColor"/></svg></button>
+            </div>
+          </div>
+
+          <div class="cc-mini-row">
+            <button class="cc-mini glass" data-toggle="dnd" aria-pressed="false">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 3a9 9 0 1 0 9 9c-3 1-9-3-9-9Z" fill="currentColor"/></svg>
+            </button>
+            <button class="cc-mini glass" data-toggle="rotate" aria-pressed="false">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 12a8 8 0 0 1 14-5l2-2v6h-6l2-2a6 6 0 1 0 1 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <button class="cc-mini glass" data-toggle="flash" aria-pressed="false">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M9 2h6l1 4-1 3v9a3 3 0 1 1-6 0V9L8 6l1-4Z" fill="currentColor"/></svg>
+            </button>
+            <button class="cc-mini glass" data-toggle="theme" aria-pressed="true" id="ccThemeToggle" title="Сменить тему">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 3a9 9 0 1 0 9 9c-3 1-9-3-9-9Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==================== NOTIFICATION PANEL ==================== -->
+      <aside class="panel notification-panel" id="notificationPanel" data-open="false" aria-hidden="true">
+        <div class="np-handle" aria-hidden="true"></div>
+        <div class="np-header">
+          <div class="np-clock" id="npClock">9:41</div>
+          <div class="np-date" id="npDate">Понедельник, 12 мая</div>
+        </div>
+        <div class="np-list" id="npList">
+          <!-- populated by JS -->
+        </div>
+      </aside>
+
+      <!-- ==================== APP CONTAINER ==================== -->
+      <section class="app-host" id="appHost" data-open="false" aria-hidden="true">
+        <div class="app-frame" id="appFrame">
+          <header class="app-bar">
+            <button class="app-back" id="appBack" aria-label="Назад">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="app-title" id="appTitle">Приложение</div>
+            <div class="app-bar-spacer"></div>
+          </header>
+          <div class="app-body" id="appBody">
+            <!-- App content injected here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== SYSTEM GESTURE BAR ==================== -->
+      <div class="gesture-zone gesture-zone--top-left" data-gesture="notif"></div>
+      <div class="gesture-zone gesture-zone--top-right" data-gesture="cc"></div>
+
+      <footer class="home-bar" id="homeBar">
+        <div class="home-bar-line"></div>
+      </footer>
+    </div>
+
+    <aside class="hint-panel">
+      <h1 class="hint-title">DevinOS</h1>
+      <p class="hint-sub">HyperOS-style interactive shell</p>
+      <ul class="hint-list">
+        <li><kbd>Свайп ↑</kbd> снизу — разблокировать / в дом</li>
+        <li><kbd>Свайп ↓</kbd> сверху справа — Центр управления</li>
+        <li><kbd>Свайп ↓</kbd> сверху слева — Уведомления</li>
+        <li><kbd>Длинный свайп ↑</kbd> — Недавние</li>
+        <li><kbd>Esc</kbd> — закрыть приложение / панель</li>
+      </ul>
+      <button class="hint-btn" id="hintLockBtn">Заблокировать экран</button>
+      <button class="hint-btn" id="hintThemeBtn">Сменить тему</button>
+      <div class="hint-wallpaper">
+        <div class="hint-wp-title">Обои</div>
+        <div class="hint-wp-grid">
+          <button class="wp-chip wp-chip--aurora" data-wallpaper="aurora" aria-label="Aurora"></button>
+          <button class="wp-chip wp-chip--sunset" data-wallpaper="sunset" aria-label="Sunset"></button>
+          <button class="wp-chip wp-chip--ocean" data-wallpaper="ocean" aria-label="Ocean"></button>
+          <button class="wp-chip wp-chip--mono" data-wallpaper="mono" aria-label="Monochrome"></button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
