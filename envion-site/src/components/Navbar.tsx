@@ -5,8 +5,8 @@ import CopyIp from "./CopyIp";
 
 const links = [
   { href: "#features", label: "Фичи" },
-  { href: "#gamemodes", label: "Режимы" },
   { href: "#join", label: "Как зайти" },
+  { href: "#donate", label: "Донат" },
   { href: "#faq", label: "FAQ" },
 ];
 
@@ -31,7 +31,7 @@ export default function Navbar() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <a href="#top" className="flex items-center gap-2.5">
-          <Logo size={30} />
+          <Logo size={32} />
           <span className="font-display text-lg font-bold tracking-tight">
             <span className="text-gradient">ENVION</span>
           </span>

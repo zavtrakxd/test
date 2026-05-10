@@ -17,7 +17,7 @@ const steps = [
   {
     icon: Server,
     title: "Добавь сервер",
-    text: 'Multiplayer → Add Server. Адрес — ниже, можно скопировать в один клик.',
+    text: "Multiplayer → Add Server. Адрес — ниже, можно скопировать в один клик.",
   },
   {
     icon: Play,
@@ -32,11 +32,14 @@ export default function HowToJoin() {
       <div className="absolute inset-0 -z-10 bg-grid opacity-20" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-cyan-300">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-cyan-200">
             Как зайти
           </div>
-          <h2 className="mt-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            4 шага до игры
+          <div className="mt-3 font-hand text-2xl text-pink-200/80">
+            всего четыре шага
+          </div>
+          <h2 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            До игры — пара минут
           </h2>
           <p className="mt-4 text-base text-slate-400">
             Без регистрации, без воды. Просто скопируй IP и заходи.
@@ -53,10 +56,10 @@ export default function HowToJoin() {
               transition={{ duration: 0.45, delay: i * 0.07 }}
               className="card card-hover relative overflow-hidden p-6"
             >
-              <span className="absolute right-4 top-4 font-display text-5xl font-bold text-white/[0.04]">
+              <span className="absolute right-4 top-4 font-display text-5xl font-bold text-white/[0.05]">
                 0{i + 1}
               </span>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-pink-300/30 bg-pink-300/10 text-pink-200">
                 <s.icon className="h-5 w-5" />
               </div>
               <h3 className="relative mt-5 font-display text-lg font-semibold">
@@ -74,9 +77,9 @@ export default function HowToJoin() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5 }}
-          className="mx-auto mt-12 flex w-full max-w-2xl flex-col items-center gap-4 rounded-2xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/[0.08] via-emerald-500/[0.02] to-transparent p-7 text-center"
+          className="mx-auto mt-12 flex w-full max-w-2xl flex-col items-center gap-4 rounded-2xl border border-pink-300/20 bg-gradient-to-br from-pink-500/[0.08] via-pink-500/[0.02] to-transparent p-7 text-center"
         >
-          <div className="text-xs uppercase tracking-[0.18em] text-emerald-300">
+          <div className="text-xs uppercase tracking-[0.18em] text-pink-200">
             IP сервера · версия {SERVER.version}
           </div>
           <CopyIp size="lg" />

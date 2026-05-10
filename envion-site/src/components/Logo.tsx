@@ -3,6 +3,9 @@ interface Props {
   className?: string;
 }
 
+/**
+ * Compact ENVION mark — stylized axolotl head silhouette inside a hex.
+ */
 export default function Logo({ size = 32, className = "" }: Props) {
   return (
     <svg
@@ -15,31 +18,63 @@ export default function Logo({ size = 32, className = "" }: Props) {
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id="lg1" x1="0" y1="0" x2="64" y2="64">
-          <stop offset="0" stopColor="#34d399" />
-          <stop offset="1" stopColor="#22d3ee" />
+        <linearGradient id="lgEdge" x1="0" y1="0" x2="64" y2="64">
+          <stop offset="0" stopColor="#ff8fb1" />
+          <stop offset="0.5" stopColor="#c4b5fd" />
+          <stop offset="1" stopColor="#7dd3fc" />
         </linearGradient>
-        <linearGradient id="lg2" x1="0" y1="0" x2="0" y2="64">
-          <stop offset="0" stopColor="#a3e635" />
-          <stop offset="1" stopColor="#34d399" />
-        </linearGradient>
+        <radialGradient id="lgBody" cx="50%" cy="55%" r="60%">
+          <stop offset="0" stopColor="#ffd9e3" />
+          <stop offset="1" stopColor="#ee7da0" />
+        </radialGradient>
       </defs>
       <path
         d="M32 4 L58 18 V46 L32 60 L6 46 V18 Z"
-        fill="url(#lg1)"
-        opacity="0.18"
-        stroke="url(#lg1)"
-        strokeWidth="2"
+        fill="#0d0e22"
+        stroke="url(#lgEdge)"
+        strokeWidth="2.5"
+      />
+      {/* gills */}
+      <path
+        d="M14 26 c4 -2 8 -2 11 1 c-4 0 -7 1 -10 4 z"
+        fill="url(#lgBody)"
       />
       <path
-        d="M32 14 L48 23 V41 L32 50 L16 41 V23 Z"
-        fill="url(#lg2)"
-        opacity="0.95"
+        d="M14 38 c4 2 8 2 11 -1 c-4 0 -7 -1 -10 -4 z"
+        fill="url(#lgBody)"
       />
       <path
-        d="M32 14 L48 23 L32 32 L16 23 Z"
-        fill="#06090c"
-        opacity="0.25"
+        d="M50 26 c-4 -2 -8 -2 -11 1 c4 0 7 1 10 4 z"
+        fill="url(#lgBody)"
+      />
+      <path
+        d="M50 38 c-4 2 -8 2 -11 -1 c4 0 7 -1 10 -4 z"
+        fill="url(#lgBody)"
+      />
+      {/* head */}
+      <ellipse cx="32" cy="32" rx="14" ry="11" fill="url(#lgBody)" />
+      {/* eyes */}
+      <path
+        d="M27 30 q1.5 -2 3 0"
+        stroke="#3b1438"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M34 30 q1.5 -2 3 0"
+        stroke="#3b1438"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* smile */}
+      <path
+        d="M30 35 q2 1.5 4 0"
+        stroke="#3b1438"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        fill="none"
       />
     </svg>
   );

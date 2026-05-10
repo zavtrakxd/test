@@ -23,19 +23,19 @@ export default function LiveStats() {
       value: status.players
         ? `${status.players.online} / ${status.players.max}`
         : "—",
-      accent: "text-lime-300",
+      accent: "text-pink-200",
     },
     {
       icon: Cpu,
       label: "Версия",
       value: status.version ?? SERVER.version,
-      accent: "text-cyan-300",
+      accent: "text-cyan-200",
     },
     {
       icon: Globe,
       label: "Адрес",
       value: SERVER.ip,
-      accent: "text-emerald-300",
+      accent: "text-violet-200",
     },
   ];
 
@@ -66,7 +66,7 @@ export default function LiveStats() {
                 </div>
               </div>
             </div>
-            <div className="pointer-events-none absolute -inset-x-6 -bottom-12 h-24 bg-gradient-to-t from-emerald-500/10 to-transparent blur-2xl" />
+            <div className="pointer-events-none absolute -inset-x-6 -bottom-12 h-24 bg-gradient-to-t from-pink-500/10 to-transparent blur-2xl" />
           </motion.div>
         ))}
       </div>
