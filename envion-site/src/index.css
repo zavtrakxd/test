@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:
+    "Inter",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  background:
+    radial-gradient(
+      900px 600px at 88% 0%,
+      rgba(255, 143, 177, 0.18),
+      transparent 65%
+    ),
+    radial-gradient(
+      900px 600px at 12% 12%,
+      rgba(125, 211, 252, 0.14),
+      transparent 65%
+    ),
+    radial-gradient(
+      1100px 700px at 50% 110%,
+      rgba(196, 181, 253, 0.12),
+      transparent 65%
+    ),
+    linear-gradient(180deg, #07071c 0%, #070716 60%, #06061a 100%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(255, 143, 177, 0.4);
+  color: #fff;
+}
+
+/* Animated grid */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 70%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    black,
+    transparent 70%
+  );
+}
+
+/* Aurora blob */
+.aurora {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.55;
+  animation: floatSlow 14s ease-in-out infinite;
+}
+
+.aurora::before {
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 143, 177, 0.55),
+    transparent 70%
+  );
+  top: -180px;
+  right: -120px;
+}
+
+.aurora::after {
+  background: radial-gradient(
+    closest-side,
+    rgba(125, 211, 252, 0.4),
+    transparent 70%
+  );
+  top: 60px;
+  left: -160px;
+  animation-delay: -4s;
+}
+
+/* Glassy card */
+.card {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.012)
+    ),
+    rgba(13, 14, 34, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(10px);
+}
+
+.card-hover {
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 143, 177, 0.4);
+  box-shadow: 0 14px 50px -14px rgba(255, 143, 177, 0.35);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(120deg, #ffc1d1 0%, #ff8fb1 35%, #c4b5fd 65%, #7dd3fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-soft {
+  background: linear-gradient(100deg, #ffe4ec, #fef9c3 60%, #cffafe);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Pixel-edge utility for tying into Minecraft vibe */
+.pixel-edge {
+  image-rendering: pixelated;
+}
+
+/* Hide scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* Bubble particles */
+.bubble {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.15) 60%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    inset -2px -2px 6px rgba(255, 255, 255, 0.35),
+    0 0 20px rgba(255, 192, 209, 0.15);
+}
+
+/* Starfield */
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 9999px;
+  background: white;
+  opacity: 0.4;
+  animation: twinkle 3s ease-in-out infinite;
+}
